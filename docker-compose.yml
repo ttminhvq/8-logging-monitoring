@@ -13,7 +13,7 @@ services:
   prometheus:
     image: prom/prometheus
     ports:
-      - "${PORT_PROMETHEUS}:${PORT_PROMETHEUS}"
+      - "${PORT_PROMETHEUS}:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
@@ -27,6 +27,7 @@ services:
       - "${PORT_GRAFANA}:${PORT_GRAFANA}"
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SERVER_HTTP_PORT=${PORT_GRAFANA}
     volumes:
       - grafana-data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
@@ -36,22 +37,22 @@ services:
     depends_on:
       - prometheus
 
-  redis-exporter:
+  crawlermanager-backend-redis-exporter:
     image: oliver006/redis_exporter
     environment:
       - REDIS_ADDR=${CRAWLERMANAGER_BACKEND_REDIS_ADDR}
     ports:
-      - "${PORT_REDIS_EXPORTER}:${PORT_REDIS_EXPORTER}"
+      - "${PORT_REDIS_EXPORTER}:9121"
     volumes:
       - ./monitoring:/monitoring
     networks:
       - shared-network
 
-  celery-exporter:
+  crawlermanager-backend-celery-exporter:
     image: danihodovic/celery-exporter
     command: --broker-url redis://${CRAWLERMANAGER_BACKEND_REDIS_ADDR}/0
     ports:
-      - "${PORT_CELERY_EXPORTER}:${PORT_CELERY_EXPORTER}"
+      - "${PORT_CELERY_EXPORTER}:9808"
     volumes:
       - ./monitoring:/monitoring
     networks:

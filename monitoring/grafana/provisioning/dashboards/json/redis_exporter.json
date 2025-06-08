@@ -1508,10 +1508,10 @@
       {
         "current": {
           "text": [
-            "redis-exporter:9121"
+            "crawlermanager-backend-redis-exporter:9121"
           ],
           "value": [
-            "redis-exporter:9121"
+            "crawlermanager-backend-redis-exporter:9121"
           ]
         },
         "datasource": {
@@ -1537,7 +1537,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Redis Dashboard for Prometheus Redis Exporter 1.x1",
+  "title": "Redis Dashboard for Prometheus Redis Exporter 1.x",
   "uid": "e008bc3f-81a2-40f9-baf2-a33fd8dec7ec1",
   "version": 1
 }
