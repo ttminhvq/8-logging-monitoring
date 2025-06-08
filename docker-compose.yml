@@ -1,0 +1,58 @@
+version: '3.8'
+
+networks:
+  shared-network:
+    name: shared-network
+    external: true
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "${PORT_PROMETHEUS}:${PORT_PROMETHEUS}"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+      - ./monitoring:/monitoring
+    networks:
+      - shared-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "${PORT_GRAFANA}:${PORT_GRAFANA}"
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring:/monitoring
+    networks:
+      - shared-network
+    depends_on:
+      - prometheus
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    environment:
+      - REDIS_ADDR=${CRAWLERMANAGER_BACKEND_REDIS_ADDR}
+    ports:
+      - "${PORT_REDIS_EXPORTER}:${PORT_REDIS_EXPORTER}"
+    volumes:
+      - ./monitoring:/monitoring
+    networks:
+      - shared-network
+
+  celery-exporter:
+    image: danihodovic/celery-exporter
+    command: --broker-url redis://${CRAWLERMANAGER_BACKEND_REDIS_ADDR}/0
+    ports:
+      - "${PORT_CELERY_EXPORTER}:${PORT_CELERY_EXPORTER}"
+    volumes:
+      - ./monitoring:/monitoring
+    networks:
+      - shared-network
